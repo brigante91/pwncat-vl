@@ -115,6 +115,22 @@ class Config:
                 "value": "~/.local/share/pwncat",
                 "type": local_dir_type,
             },
+            "color_theme": {
+                "value": "monokai",
+                "type": str,
+            },
+            "history_size": {
+                "value": 1000,
+                "type": int,
+            },
+            "log_max_bytes": {
+                "value": 104857600,  # 100MB
+                "type": int,
+            },
+            "log_backup_count": {
+                "value": 5,
+                "type": int,
+            },
         }
 
         # Locals are set per-used-module

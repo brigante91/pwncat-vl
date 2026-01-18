@@ -16,6 +16,9 @@ Rather than let the project fade away, this fork was created to **fix critical i
 ### Key changes in this fork:
 - Python **3.13 compatibility**
 - Updated dependencies for modern environments
+- **Major feature additions**: Network methods, error handling, file transfer enhancements
+- **Interactive menu** for improved user experience
+- **Advanced C2 channels** (HTTP/HTTPS covert)
 - Minimal but active maintenance (contributions welcome!)
 
 ---
@@ -196,6 +199,12 @@ pwncat-vl -m windows 10.10.10.10 4444
 pwncat-vl -m windows -lp 4444
 ```
 
+You can also start pwncat with an interactive menu for easier navigation:
+
+```shell
+pwncat-vl --menu
+```
+
 For more information on the syntax and argument handling, see the
 help information with ``pwncat-vl --help`` or visit the [documentation].
 
@@ -237,31 +246,139 @@ perform automated enumeration, persistence and privilege escalation tasks. The
 local `pwncat` prompt provides a number of useful features for standard
 penetration tests including:
 
-* File upload and download
+* File upload and download (with recursive support, resume, compression, rate limiting)
 * Automated privilege escalation enumeration
 * Automated privilege escalation execution
 * Automated persistence installation/removal
 * Automated tracking of modified/created files
     * `pwncat` also offers the ability to revert these remote "tampers" automatically
+* **Port forwarding** (local and remote)
+* **SOCKS proxy** (SOCKS4 and SOCKS5)
+* **Advanced C2 channels** (HTTP/HTTPS covert)
+* **Interactive menu** for improved user experience
+* **Enhanced error handling** with automatic recovery
+* **Module pattern matching** for easy module discovery
+* **Session management** with naming and tagging
+* **LinPEAS-style enumeration** for comprehensive privilege escalation checks
 
 The underlying framework for interacting with the remote host aims to abstract
 away the underlying shell and connection method as much as possible, allowing
 commands and plugins to interact seamlessly with the remote host.
+
+### New Features in v0.6.0
+
+#### Network Methods
+- **Port Forwarding**: Forward ports through your session
+  ```bash
+  forward -L 8080 -h 10.10.10.10 -p 80    # Local forwarding
+  forward -R 9090 -h 127.0.0.1 -p 3306   # Remote forwarding
+  ```
+- **SOCKS Proxy**: Dynamic port forwarding
+  ```bash
+  socks -p 1080              # Start SOCKS5 proxy
+  socks -p 1080 -v 4         # Start SOCKS4 proxy
+  ```
+
+#### File Transfer
+- **Recursive Upload**: Upload entire directories
+  ```bash
+  upload -r /local/dir /remote/dir
+  ```
+- **Resume Transfers**: Resume interrupted uploads
+  ```bash
+  upload -R file.txt
+  ```
+- **Compression**: Automatic compression for large files
+  ```bash
+  upload -c large_file.bin
+  ```
+- **Rate Limiting**: Control upload speed
+  ```bash
+  upload -l 1048576 file.txt  # 1MB/s
+  ```
+
+#### Interactive Menu
+Start pwncat with an interactive menu:
+```bash
+pwncat --menu
+```
+
+#### Module System
+- **Pattern Matching**: Find modules easily
+  ```bash
+  match escalate.*           # Find escalation modules
+  match linux.enumerate.*   # Find Linux enumeration modules
+  ```
+- **Enhanced Context**: Better module information
+  ```bash
+  use linux.enumerate.system.distro
+  # Shows detailed module info, arguments, types, defaults
+  ```
+
+#### Session Management
+- **Naming**: Name your sessions
+  ```bash
+  sessions --name "web-server" 1
+  ```
+- **Tagging**: Tag sessions for organization
+  ```bash
+  sessions --tag "production" 1
+  sessions --tag "critical" 1
+  ```
+
+#### LinPEAS-style Enumeration
+- **Comprehensive Checks**: Run LinPEAS-style enumeration
+  ```bash
+  run enumerate.linpeas                    # All checks
+  run enumerate.linpeas output=report.txt  # Save to file
+  run enumerate.linpeas categories=sudo,suid,cron  # Specific categories
+  run enumerate.linpeas quiet=true         # Findings only
+  ```
+
+#### Customization
+- **Color Themes**: Customize your terminal colors
+  ```bash
+  theme list              # List available themes
+  theme set vs            # Change theme
+  set color_theme monokai # Via config
+  ```
+- **Configurable History**: Control command history size
+  ```bash
+  set history_size 2000
+  ```
+- **Log Rotation**: Configure log file management
+  ```bash
+  set log_max_bytes 52428800    # 50MB
+  set log_backup_count 10       # 10 backups
+  ```
 
 You can learn more about interacting with `pwncat` and about the underlying framework
 in the [documentation]. If you have an idea for a new privilege escalation method
 or persistence method, please take a look at the API documentation specifically.
 Pull requests are welcome!
 
+## Recent Additions (v0.6.0)
+
+Many previously planned features have been implemented:
+
+* ✅ **Network methods**: Port forwarding (local/remote), SOCKS proxy (SOCKS4/5)
+* ✅ **File transfer enhancements**: Recursive upload, resume, compression, rate limiting
+* ✅ **Error handling**: Centralized error handler with automatic recovery
+* ✅ **Module system**: Pattern matching, enhanced context
+* ✅ **Session management**: Naming, tagging, improved UI
+* ✅ **Interactive menu**: Menu-driven interface for easier use
+* ✅ **Advanced C2 channels**: HTTP/HTTPS covert channels
+* ✅ **Customization**: Color themes, configurable history, log rotation
+
 ## Planned Features
 
-**pwncat** would like to be come a red team swiss army knife. Hopefully soon,
-more features will be added.
+**pwncat** continues to evolve as a red team swiss army knife. Future features may include:
 
 * Persistence methods (bind shell, cronjobs, SSH access, PAM abuse, etc.)
 * Aggression methods (spam randomness to terminals, flush firewall, etc.)
 * Meme methods (terminal-parrot, cowsay, wall, etc.)
-* Network methods (port forward, internet access through host, etc.)
+* Resilient sessions (auto-reconnect, state restoration)
+* Additional C2 channels (DNS tunneling, ICMP tunneling, WebSocket)
 
 ## Known Issues
 

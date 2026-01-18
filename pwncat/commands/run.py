@@ -5,6 +5,7 @@ import pwncat
 import pwncat.modules
 from pwncat.util import console
 from pwncat.commands import Complete, Parameter, CommandDefinition, get_module_choices
+from pwncat.error_handler import handle_error, ErrorSeverity
 
 
 class Command(CommandDefinition):
@@ -68,19 +69,29 @@ class Command(CommandDefinition):
 
             if args.module is not None:
                 manager.config.back()
-        except pwncat.modules.ModuleNotFound:
+        except pwncat.modules.ModuleNotFound as exc:
+            handle_error(exc, f"run module {module_name}", component="module", 
+                        recoverable=False, severity=ErrorSeverity.ERROR)
             console.log(f"[red]error[/red]: {module_name}: not found")
             return
         except pwncat.modules.ArgumentFormatError as exc:
+            handle_error(exc, f"run module {module_name}", component="module",
+                        recoverable=True, severity=ErrorSeverity.ERROR)
             console.log(f"[red]error[/red]: {exc}: invalid argument")
             return
         except pwncat.modules.MissingArgument as exc:
+            handle_error(exc, f"run module {module_name}", component="module",
+                        recoverable=True, severity=ErrorSeverity.ERROR)
             console.log(f"[red]error[/red]: missing argument: {exc}")
             return
         except pwncat.modules.InvalidArgument as exc:
+            handle_error(exc, f"run module {module_name}", component="module",
+                        recoverable=True, severity=ErrorSeverity.ERROR)
             console.log(f"[red]error[/red]: invalid argument: {exc}")
             return
         except pwncat.modules.ModuleFailed as exc:
+            handle_error(exc, f"run module {module_name}", component="module",
+                        recoverable=True, severity=ErrorSeverity.ERROR)
             if args.traceback:
                 console.print_exception()
             else:

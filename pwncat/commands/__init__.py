@@ -399,23 +399,32 @@ def resolve_blocks(source: str):
 
 
 class DatabaseHistory(History):
-    """Yield history from the host entry in the database"""
+    """Yield history from the host entry in the database with size limits"""
 
-    def __init__(self, manager):
+    def __init__(self, manager, max_size: int = 1000):
         super().__init__()
         self.manager = manager
+        self.max_size = max_size
 
     def load_history_strings(self) -> Iterable[str]:
         """Load the history from the database"""
 
         with self.manager.db.transaction() as conn:
-            yield from reversed(conn.root.history)
+            # Return in reverse order (newest first) but limit size
+            history_list = list(conn.root.history)
+            start_idx = max(0, len(history_list) - self.max_size)
+            yield from reversed(history_list[start_idx:])
 
     def store_string(self, string: str) -> None:
-        """Store a command in the database"""
+        """Store a command in the database with size limit"""
 
         with self.manager.db.transaction() as conn:
             conn.root.history.append(string)
+            # Limit history size to prevent database bloat
+            if len(conn.root.history) > self.max_size:
+                # Remove oldest entries
+                excess = len(conn.root.history) - self.max_size
+                conn.root.history = conn.root.history[excess:]
 
 
 class CommandParser:
@@ -457,10 +466,21 @@ class CommandParser:
         """This needs to happen after __init__ when the database is fully
         initialized."""
 
-        history = DatabaseHistory(self.manager)
+        # Get configurable history size
+        history_size = self.manager.config.get("history_size", 1000)
+        history = DatabaseHistory(self.manager, max_size=history_size)
+        
         completer = CommandCompleter(self.manager, self.commands)
         lexer = PygmentsLexer(CommandLexer.build(self.commands))
-        style = style_from_pygments_cls(get_style_by_name("monokai"))
+        
+        # Get configurable color theme
+        theme_name = self.manager.config.get("color_theme", "monokai")
+        try:
+            style = style_from_pygments_cls(get_style_by_name(theme_name))
+        except:
+            # Fallback to monokai if theme not found
+            style = style_from_pygments_cls(get_style_by_name("monokai"))
+        
         auto_suggest = AutoSuggestFromHistory()
         bindings = KeyBindings()
 

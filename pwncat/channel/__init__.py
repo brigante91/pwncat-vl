@@ -629,3 +629,11 @@ register("connect", Connect)
 register("ssh", Ssh)
 register("ssl-bind", SSLBind)
 register("ssl-connect", SSLConnect)
+
+# Advanced C2 channels
+try:
+    from pwncat.channel.http import HTTPChannel
+    register("http", HTTPChannel)
+    register("https", HTTPChannel)  # Same class, uses ssl parameter
+except ImportError:
+    pass

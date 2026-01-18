@@ -4,6 +4,113 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-01-27
+
+### Added
+
+#### Network Methods
+- **Port Forwarding**: New `forward` command for local and remote port forwarding
+  - Local port forwarding: `forward -L PORT -h HOST -p PORT`
+  - Remote port forwarding: `forward -R PORT -h HOST -p PORT`
+  - List active forwards: `forward -l`
+  - Stop forwarding: `forward -s PORT`
+- **SOCKS Proxy**: New `socks` command for dynamic port forwarding
+  - SOCKS4 and SOCKS5 support
+  - Start proxy: `socks -p PORT [-v VERSION]`
+  - List proxies: `socks -l`
+  - Stop proxy: `socks -s PORT`
+
+#### Error Handling
+- **Centralized Error Handler**: New error handling system with automatic recovery
+  - Error severity levels (INFO, WARNING, ERROR, CRITICAL)
+  - Automatic recovery strategies for common errors
+  - Error history tracking
+  - Decorator support: `@with_error_handling`
+  - Better error messages with context and suggestions
+
+#### Module System Enhancement
+- **Pattern Matching**: New `match` command for finding modules by pattern
+  - Pattern matching: `match escalate.*`
+  - Programmatic access: `manager.match_modules(pattern)`
+  - Support for glob patterns and regex
+- **Enhanced Module Context**: Improved `use` command
+  - Shows detailed module information
+  - Displays arguments, types, defaults, and help text
+  - Formatted table output
+
+#### File Transfer Enhancement
+- **Recursive Upload**: Upload entire directories with `upload -r`
+- **Resume Transfers**: Resume interrupted uploads with `upload -R`
+  - Automatic hash verification (MD5)
+  - Skip files that already exist and match
+- **Automatic Compression**: Compress large files with `upload -c`
+  - Gzip compression for files > 1MB
+  - Automatic decompression on remote host
+- **Rate Limiting**: Limit upload speed with `upload -l BYTES_PER_SEC`
+- **Checksum Verification**: MD5 hash comparison for integrity
+
+#### Session Management
+- **Session Naming**: Name sessions with `sessions --name NAME ID`
+- **Session Tagging**: Tag sessions with `sessions --tag TAG ID`
+  - Multiple tags per session
+  - Color-coded display in session list
+
+#### Advanced C2 Channels
+- **HTTP/HTTPS Covert Channel**: New HTTP channel for tunneling data
+  - Base64 encoding for data obfuscation
+  - Configurable user-agent
+  - Send via POST, receive via GET
+
+#### Interactive Menu
+- **Menu-Driven Interface**: New `--menu` flag for interactive menu
+  - Connect to targets
+  - Manage sessions
+  - Run modules
+  - File transfer
+  - Network methods
+  - All major operations accessible via menu
+
+#### Configuration & Customization
+- **Color Themes**: New `theme` command for customizable color schemes
+  - List available themes: `theme list`
+  - Set theme: `theme set THEME_NAME`
+  - Support for all Pygments themes
+  - Persistent configuration via `set color_theme`
+- **Configurable History**: Persistent command history with size limits
+  - Configurable via `set history_size`
+  - Automatic rotation to prevent database bloat
+- **Configurable Log Rotation**: Customizable log file management
+  - `set log_max_bytes` for maximum file size
+  - `set log_backup_count` for backup retention
+
+#### LinPEAS-style Enumeration
+- **Comprehensive Enumeration Module**: New `enumerate.linpeas` module for comprehensive privilege escalation checks
+  - LinPEAS-style organized output by categories
+  - System information, sudo/suid checks, capabilities, cron jobs, processes, network, credentials, and more
+  - Export results to file with formatted report
+  - Filter by specific categories
+  - Quiet mode for findings-only output
+  - Uses native pwncat enumeration modules for integration
+
+#### Documentation
+- Complete documentation for network methods
+- Error handling documentation
+- Module system documentation
+- All integrated into main documentation
+
+### Changed
+- **Upload Command**: Completely rewritten with new features (recursive, resume, compression, rate limiting)
+- **Sessions Command**: Enhanced with naming and tagging support
+- **Use Command**: Improved with detailed module information display
+- **Error Handling**: Integrated throughout critical components
+- **Command History**: Improved with size limits and automatic rotation
+- **Log Rotation**: Made configurable instead of hardcoded
+
+### Fixed
+- Improved error recovery in channel operations
+- Better error messages throughout the framework
+- Enhanced stability with centralized error handling
+
 ## [0.5.9] - 2025-07-06
 
 ### Added

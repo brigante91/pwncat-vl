@@ -24,6 +24,7 @@ import functools
 from typing import Optional
 
 from pwncat.channel import Channel, ChannelError, ChannelClosed
+from pwncat.error_handler import with_error_handling, ErrorSeverity
 
 
 def connect_required(method):
@@ -95,6 +96,7 @@ class Socket(Channel):
         fcntl.fcntl(self.client, fcntl.F_SETFL, os.O_NONBLOCK)
 
     @connect_required
+    @with_error_handling(operation="send data", component="channel", severity=ErrorSeverity.ERROR)
     def send(self, data: bytes):
         """Send data to the remote shell. This is a blocking call
         that only returns after all data is sent."""

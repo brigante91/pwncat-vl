@@ -97,6 +97,11 @@ def main():
         action="store_true",
         help="Enable verbose output for the remote commands executed by `pwncat`",
     )
+    parser.add_argument(
+        "--menu",
+        action="store_true",
+        help="Start interactive menu instead of CLI",
+    )
     args = parser.parse_args()
 
     # Print the version number and exit.
@@ -183,7 +188,10 @@ def main():
             query_args["ssl"] = args.ssl
             querystring = None
 
-            if args.connection_string:
+            # If --listen is used and connection_string is just a number, treat it as a port
+            if args.listen and args.connection_string and args.connection_string.isdigit():
+                query_args["port"] = args.connection_string
+            elif args.connection_string:
                 m = connect.Command.CONNECTION_PATTERN.match(args.connection_string)
                 query_args["protocol"] = m.group("protocol")
                 query_args["user"] = m.group("user")
@@ -344,7 +352,12 @@ def main():
                     sys.stdout.write("\b\b\r")
                     manager.log("[yellow]warning[/yellow]: cancelled by user")
 
-        manager.interactive()
+        # Use interactive menu if requested
+        if args.menu:
+            from pwncat.ui.menu import show_interactive_menu
+            show_interactive_menu(manager)
+        else:
+            manager.interactive()
 
         if manager.sessions:
             with Progress(

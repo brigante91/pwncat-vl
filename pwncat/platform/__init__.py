@@ -501,10 +501,14 @@ class Platform(ABC):
         self.name = "unknown"
         self._current_user = None
 
-        # output log to a file
+        # output log to a file with configurable rotation
         if log is not None:
+            # Get configurable log rotation settings from manager config
+            max_bytes = session.manager.config.get("log_max_bytes", 104857600)  # 100MB default
+            backup_count = session.manager.config.get("log_backup_count", 5)
+            
             handler = logging.handlers.RotatingFileHandler(
-                log, maxBytes=1024 * 1024 * 100, backupCount=5
+                log, maxBytes=max_bytes, backupCount=backup_count
             )
             handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
             self.logger.addHandler(handler)

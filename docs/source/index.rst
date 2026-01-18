@@ -73,6 +73,9 @@ well. Pull requests are always welcome!
     enum.rst
     privesc.rst
     persist.rst
+    network_methods.rst
+    error_handling.rst
+    module_system.rst
     commands/index.rst
     api/pwncat.rst
 
